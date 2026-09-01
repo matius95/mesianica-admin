@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⛪ Mesiánica Admin - Sistema Web de Gestión de Iglesia
 
-## Getting Started
+Sistema web moderno y seguro para la administración integral de la congregación, registro de personas, distribución por sectores/barrios, asignación de Asistentes de Familia, control de usuarios y gestión de permisos basados en **Acciones del Sistema (RBAC)**.
 
-First, run the development server:
+---
 
+## 🌟 REGLA DE ORO DE PERMISOS
+
+> **CADA VEZ QUE SE DESARROLLE E INTEGRE UNA NUEVA FUNCIONALIDAD, MÓDULO O SECCIÓN EN EL SISTEMA, ES OBLIGATORIO REGISTRAR SUS CORRESPONDIENTES ACCIONES EN EL CATÁLOGO DE LA BASE DE DATOS (`Action`).**
+
+---
+
+## 🚀 Stack Tecnológico
+
+- **Frontend:** Next.js (App Router, React 19, TypeScript)
+- **Estilos:** Tailwind CSS v4 con tema oscuro moderno, glassmorphism y micro-interacciones.
+- **Base de Datos & ORM:** Prisma ORM con SQLite (entorno local cero-configuración) y preparado para PostgreSQL en producción.
+- **Seguridad & Autenticación:** Cookies HTTP-Only (`session_token`), expiración de sesión por inactividad de **30 minutos** (configurables), hashing con `bcryptjs` y matriz de permisos por **Acciones del Sistema**.
+- **Pruebas Automatizadas:** Vitest.
+
+---
+
+## 🛡️ Arquitectura de Seguridad & Permisos por Acciones
+
+El sistema utiliza una arquitectura de control de accesos basada en acciones de grano fino:
+
+1. **Acciones (`Action`):** Catálogo de permisos específicos del sistema (ejemplo: `crear-usuario`, `editar-persona`, `crear-barrio`, `editar-rol`, `ver-configuraciones`, `editar-configuraciones`).
+2. **Roles (`Role`):** Roles predefinidos (`ADMIN`, `ASISTENTE_BARRIO`, `MEMBER`).
+3. **Relación Roles × Acciones (`RoleAction`):** Asignación dinámica mediante modales desde la vista de Roles (`/role`).
+4. **Relación Usuarios × Roles (`UserRole`):** Permite asignar múltiples roles a una cuenta de usuario desde la vista de Usuarios (`/users`).
+
+---
+
+## ⚡ Guía de Inicio Rápido
+
+### 1. Instalación de Dependencias
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Sincronizar Esquema de Base de Datos
+```bash
+npx prisma db push
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Cargar Datos Iniciales (Roles, Acciones y Admin)
+```bash
+npx tsx prisma/seed.ts
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Iniciar Servidor de Desarrollo
+```bash
+npm run dev
+```
+Accede a [http://localhost:3000](http://localhost:3000) en el navegador.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🔑 Credenciales por Defecto (Prueba Local)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Login URL:** [http://localhost:3000/auth/login](http://localhost:3000/auth/login)
+- **Usuario:** `admin@mesianica.org`
+- **Contraseña:** `admin123`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧪 Ejecución de Pruebas Automatizadas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npx vitest run
+```

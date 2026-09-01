@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Action {
+  id          String       @id @default(uuid())
+  name        String       @unique // ej: "crear-usuario", "editar-persona", "crear-barrio"
+  description String?
+  category    String       @default("General") // "Usuarios", "Personas", "Barrios", "Roles", "Configuraciones"
+  roles       RoleAction[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Role {
+  id          String       @id @default(uuid())
+  name        String       @unique // ej: "ADMIN", "ASISTENTE_BARRIO", "MEMBER"
+  description String?
+  users       UserRole[]
+  actions     RoleAction[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model RoleAction {
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  actionId  String
+  action    Action   @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([roleId, actionId])
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  status       String     @default("ACTIVO") // "ACTIVO", "INACTIVO"
+  personId     String?    @unique
+  person       Person?    @relation(fields: [personId], references: [id])
+  roles        UserRole[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model UserRole {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, roleId])
+}
+
+model Barrio {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  assistantId String?
+  members     Person[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Person {
+  id        String    @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  address   String?
+  isMember  Boolean   @default(true)
+  status    String    @default("ACTIVO") // ACTIVO, INACTIVO, VISITANTE
+  barrioId  String?
+  barrio    Barrio?   @relation(fields: [barrioId], references: [id])
+  user      User?
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique // ej: "session_duration_minutes", "church_name", "contact_email"
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}
